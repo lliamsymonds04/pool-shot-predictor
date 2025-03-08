@@ -11,7 +11,7 @@ if not cap.isOpened():
     exit()
 
 ball_handler = BallHandler()
-    
+
 while True:
     ret, frame = cap.read()
     if not ret:
@@ -78,14 +78,26 @@ while True:
         if valid:
             circles.append(new_circle)
             
+    found_balls = {}
+    for ball in ball_handler.balls.keys():
+        found_balls[ball] = False    
+    
+        
     for circle in circles:
         x, y, r = circle
         
-        cv2.circle(frame, (int(x), int(y)), int(r), (0, 255, 0), 4)
         colour = ball_handler.eval_circle(x, y, r, hsv_frame)
-        cv2.putText(frame, colour, (int(x), int(y)), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2, cv2.LINE_AA) 
-        plot_hsv(frame, x, y, 40)               
+        plot_hsv(frame, x, y, 50)               
+        if colour and found_balls.get(colour, False) == False:
+            found_balls[colour] = True
+            ball_handler.update_ball(x, y, r, colour)
                 
+    for name, found in found_balls.items():
+        if not found:
+            ball_handler.not_found(name)
+
+    ball_handler.draw_balls(frame)
+    
     cv2.imshow('frame', frame)
     if cv2.waitKey(1) == ord('q'):
         break
