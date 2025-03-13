@@ -31,6 +31,7 @@ while True:
     #Apply morphological operations to smooth boundaries between white/colored
     kernel = np.ones((5, 5), np.uint8)
     morph_frame = cv2.morphologyEx(blurred_gray, cv2.MORPH_CLOSE, kernel)
+
     
     # Find circles in both processed images
     circles_gray = cv2.HoughCircles(
@@ -71,6 +72,7 @@ while True:
             x1, y1 = new_circle[:2]
             x2, y2 = circle[:2]
             
+            #check distances to remove overlapping circles
             if abs(x1 - x2) + abs(y1 - y2) < 30:
                 valid = False
                 break 

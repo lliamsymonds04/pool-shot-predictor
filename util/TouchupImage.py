@@ -1,32 +1,3 @@
-""" import cv2
-import numpy as np
-
-def apply_clahe(image: np.ndarray) -> np.ndarray:
-    lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
-    l, a, b = cv2.split(lab)
-    
-    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
-    l = clahe.apply(l)
-    
-    lab = cv2.merge((l, a, b))
-    return cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
-
-def remove_shadows(image: np.ndarray) -> np.ndarray:
-    hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    v = hsv[:, :, 2]  # Extract brightness channel
-    normalized_v = cv2.normalize(v, None, 0, 255, cv2.NORM_MINMAX)
-    hsv[:, :, 2] = normalized_v
-    return cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
-
-
-def touchup_image(image: np.ndarray) -> np.ndarray:
-    image = apply_clahe(image)
-    image = remove_shadows(image)
-    # hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
-    # hue, sat, val = cv2.split(hsv)
-    
-    return image    """
-
 import cv2
 import numpy as np
 
