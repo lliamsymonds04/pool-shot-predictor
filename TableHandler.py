@@ -67,7 +67,8 @@ def detect_pool_table(image_path: str, debug: bool = False):
         if top_len > side_len:
             ordered_corners = np.array([top_points[0], top_points[1], bottom_points[1], bottom_points[0]])
         else:
-            ordered_corners = np.array([top_points[1], bottom_points[1], bottom_points[0], top_points[0]])
+            # ordered_corners = np.array([top_points[1], bottom_points[1], bottom_points[0], top_points[0]])
+            ordered_corners = np.array([bottom_points[0], top_points[0], top_points[1], bottom_points[1]])
 
         #warp the image to a top down view
         table_length = 800
