@@ -12,6 +12,7 @@ class BallHandler:
     def __init__(self):
         self.balls = {}
         self.colours = {}
+        self.colour_data = {}
           
         for ball in ball_data["balls"]:
             colour: list[int] = ball["colour"]
@@ -23,11 +24,15 @@ class BallHandler:
                 self.balls["half_" + ball["name"]] = BallTracker(ball_name=ball["name"], ball_number=ball["number"] + 8, colour=bgr)
                 self.colours[ball["name"]] = colour
             
+                self.colour_data[ball["name"]] = {
+                    "hue": ball["hue"],
+                    "hue_range": ball["hue_range"]
+                } 
 
             self.balls[ball["name"]] = BallTracker(ball_name=ball["name"], ball_number=ball["number"], colour=bgr)
             
         
-    def eval_circle(self, x: float, y: float, r: float, hsv_frame: np.ndarray):
+    def classify_ball(self, x: float, y: float, r: float, hsv_frame: np.ndarray):
         #find the correspoding colour 
         found_colours = []
         points = [
@@ -98,6 +103,101 @@ class BallHandler:
             return "black"
         else:
             return None
+    
+    def classify_ball_2(self, x: float, y: float, r: float, hsv_image: np.ndarray):
+        # Create a mask for the circle
+        mask = np.zeros(hsv_image.shape[:2], dtype=np.uint8)
+        cv2.circle(mask, (x,y), r, 255, -1)
+        
+        # Apply the mask to the HSV image
+        masked_image = cv2.bitwise_and(hsv_image, hsv_image, mask=mask)
+        
+        # Create a saturation mask for pixels above the minimum saturation
+        colour_sat_mask = cv2.inRange(masked_image, np.array([0, 140, 50]), np.array([179, 255, 255]))
+        # low_sat_mask = cv2.inRange(masked_image, np.array([0, 0, 0]), np.array([179, 30, 255]))
+        # Combine both masks
+        colour_final_mask = cv2.bitwise_and(mask, colour_sat_mask)
+        # low_final_mask = cv2.bitwise_and(mask, low_sat_mask)
+
+        
+        # Get all non-zero pixels
+        non_zero_pixels = hsv_image[colour_final_mask > 0]
+        
+        # If no pixels meet the criteria, return None
+        if len(non_zero_pixels) == 0:
+            return None
+        
+        # Calculate the average color
+        avg_color = np.mean(non_zero_pixels, axis=0)
+        
+        return tuple(avg_color.astype(int))
+    
+    def classify_ball_3(self, x: float, y: float, r: float, hsv_image: np.ndarray):
+        branches = 8
+        found_colours = {} 
+        colours = []
+        for i in range(0, 360, int(360/branches)):  
+            angle = np.radians(i)
+            for j in range(2,r,3):
+                x1 = int(x + j * np.cos(angle))
+                y1 = int(y + j * np.sin(angle))
+                
+                max_y, max_x = hsv_image.shape[:2]
+                h,s,v = hsv_image[min(max(int(y1),0),max_y-1), min(max(int(x1),0),max_x-1)]
+                
+                if s < 30:
+                    continue
+                
+                # if v < 40:
+                    # continue
+                
+                colours.append((h,s,v))
+
+                """
+                for colour, values in self.colours.items():
+                    hue_diff = abs((values[0] - h + 90) % 180 - 90)
+                    if abs(hue_diff) > 6:
+                        continue
+                    
+                    v_diff = abs(values[2] - v)
+                    if v_diff > 20:
+                        continue
+                    
+                    # return colour
+                    found_colours[colour] = found_colours.get(colour, 0) + 1
+                """    
+                    
+        colours = np.array(colours)
+        mean = np.mean(colours, axis=0)
+        std = np.std(colours, axis=0)
+
+        threshold = 1
+
+        distances = np.abs(colours - mean)
+        mask = np.all(distances < threshold * std, axis=1)
+    
+        # Return filtered array
+        filtered_colours = colours[mask]
+    
+        avg_colour = np.mean(filtered_colours, axis=0) 
+        
+        
+        for name, data in self.colour_data.items():
+            for colour in colours:
+                hue_diff = abs((data["hue"] - colour[0] + 90) % 180 - 90)
+
+                if hue_diff > data["hue_range"]:
+                    continue
+
+            
+                found_colours[name] = found_colours.get(name, 0) + 1
+            
+        print(avg_colour)
+        print(found_colours)    
+
+
+        return avg_colour
+
     
     def update_ball(self, x: float, y: float, r: float, ball_name: str):
         self.balls[ball_name].update(x, y, r)

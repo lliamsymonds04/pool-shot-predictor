@@ -11,37 +11,55 @@
         {
             "number": 1,
             "name": "yellow",
-            "colour": [30,255,255]
+            "colour": [30,255,255],
+            "min_hue": 25, 
+            "max_hue": 35,
+            "hue": 30,
+            "hue_range": 5
         },
         {
             "number": 2,
             "name": "blue",
-            "colour": [120,255,255]
+            "colour": [120,255,255],
+            "min_hue": 100,
+            "max_hue": 125,
+            "hue": 110,
+            "hue_range": 10
         },
         {
             "number": 3,
             "name": "red",
-            "colour": [0,255,255]
+            "colour": [0,255,255],
+            "hue": 175,
+            "hue_range": 10
         },
         {
             "number": 4,
             "name": "purple",
-            "colour": [135,255,255]
+            "colour": [135,255,255],
+            "hue": 135,
+            "hue_range": 15
         },
         {
             "number": 5,
             "name": "orange",
-            "colour": [15,255,255]
+            "colour": [15,255,255],
+            "hue": 15,
+            "hue_range": 10
         },
         {
             "number": 6,
             "name": "green",
-            "colour": [75,255,80]
+            "colour": [75,255,80],
+            "hue": 65,
+            "hue_range": 15
         },
         {
             "number": 7,
             "name": "maroon",
-            "colour": [0,255,80]
+            "colour": [0,255,80],
+            "hue": 0,
+            "hue_range": 0
         },
         {
             "number": 8,

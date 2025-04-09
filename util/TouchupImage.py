@@ -48,4 +48,5 @@ def touchup_image(img: np.ndarray):
     hsv_corrected = cv2.merge([h, s, v_corrected])
     shadow_free = cv2.cvtColor(hsv_corrected, cv2.COLOR_HSV2BGR)
     
+    #returns BGR format
     return shadow_free 
