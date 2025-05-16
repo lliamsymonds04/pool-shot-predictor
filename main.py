@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-from ProcessTable import process_table, find_balls, remove_table_green, make_balls_white
+from ProcessTable import process_table, find_balls, remove_table_green, make_balls_white, merge_balls, draw_balls_debug
 from BallHandler import BallHandler
 from util.TouchupImage import touchup_image
 
@@ -17,10 +17,15 @@ def process_image(img: np.ndarray):
     
 
     removed_green = remove_table_green(table)
-    cv2.imshow("Removed Green", removed_green)
     white_balls = make_balls_white(removed_green)
-    cv2.imshow("White Balls", white_balls)
-    balls = find_balls(removed_green)
+    balls, im1 = find_balls(removed_green)
+    balls2, im2 = find_balls(white_balls)
+    cv2.imshow("Balls", im1)
+    cv2.imshow("Balls2", im2)
+    merged_balls = merge_balls(balls, balls2)
+    new_balls = draw_balls_debug(removed_green, merged_balls)
+    cv2.imshow("Merged Balls", new_balls)
+    # balls = find_balls_contours(removed_green)
     
     if cv2.waitKey(0) == ord('q'):
         cv2.destroyAllWindows()
