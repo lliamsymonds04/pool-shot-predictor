@@ -175,14 +175,3 @@ def merge_balls(balls1: list[tuple[int]], balls2: list[tuple[int]]):
             
     return merged_balls
 
-
-def draw_balls_debug(img: np.ndarray, balls: list[tuple[int]]):
-    """
-    draws the balls on the image
-    """
-    new_img = img.copy()
-    for ball in balls:
-        x, y, r = ball
-        cv2.circle(new_img, (x, y), r, (0, 255, 0), 2)
-        cv2.circle(new_img, (x, y), 2, (0, 0, 255), 3) # Draw center of circle
-    return new_img
