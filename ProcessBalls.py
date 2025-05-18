@@ -12,16 +12,14 @@ for ball in ball_data["balls"]:
     colour: list[int] = ball["colour"]
 
     #check if ball can be striped
+    colours[ball["name"]] = colour
     if ball["number"] != 8 and ball["number"] != 0:
-        colours[ball["name"]] = colour
     
         colour_data[ball["name"]] = {
             "hue": ball["hue"],
             "hue_range": ball["hue_range"],
             "v_range": ball["v_range"],
         } 
-
-print(colour_data)
     
 def draw_balls_debug(img: np.ndarray, balls: list[tuple[int]]):
     """
@@ -43,6 +41,8 @@ def classify_balls(balls: list[tuple[int]], table_img: np.ndarray):
         x,y,r = ball
         
         classifications.append(classify_ball(x, y, r, hsv_image))
+
+    return classifications
         
 def get_colour(h: int, s: int, v: int):
     #handle black
@@ -50,36 +50,32 @@ def get_colour(h: int, s: int, v: int):
         return "black"
     
     #handle other colours
-    for colour, values in colours.items():
+    # for colour, values in colours.items():
+    for colour in colour_data.keys():
         target_hue = colour_data[colour]["hue"]
         hue_range = colour_data[colour]["hue_range"]
         v_range = colour_data[colour]["v_range"]
-
 
         hue_diff = abs((int(target_hue) - int(h) + 90) % 180 - 90)
         if abs(hue_diff) > hue_range:
             continue
         
-        """ 
-        v_diff = abs(values[2] - int(v))
-        if v_diff > 20:
-            continue
-         """
         if v < v_range[0] or v > v_range[1]:
             continue
               
         return colour
+
     #handle white
     if s < 30 and v > 200:
         return "white"
     
-
     return "unknown"
         
-def classify_ball(x: int, y: int, r: int, hsv_image: np.ndarray, debug: bool = False):
+def classify_ball(x: int, y: int, r: int, hsv_image: np.ndarray, debug: bool = False) -> tuple[str, bool]:
     branches = 8
     colour_occurences = {}
     spots= 0
+    max_y, max_x = hsv_image.shape[:2]
     for i in range(0, 360, int(360/branches)):  
         angle = np.radians(i)
         for j in range(2,r,3):
@@ -87,7 +83,6 @@ def classify_ball(x: int, y: int, r: int, hsv_image: np.ndarray, debug: bool = F
             x1 = int(x + j * np.cos(angle))
             y1 = int(y + j * np.sin(angle))
             
-            max_y, max_x = hsv_image.shape[:2]
             h,s,v = hsv_image[min(max(int(y1),0),max_y-1), min(max(int(x1),0),max_x-1)]
             colour = get_colour(h, s, v)
             if debug:
@@ -108,25 +103,25 @@ def classify_ball(x: int, y: int, r: int, hsv_image: np.ndarray, debug: bool = F
         sorted_colours.remove("unknown")
         if len(sorted_colours) == 0:
             # no detected colours
-            return "unknown"
+            return ("unknown", False)
         
     most_frequent_colour = sorted_colours[0]
     
     if most_frequent_colour == "black":
-        return "black"
+        return ("black", False)
 
     if "white" in sorted_colours:
         sorted_colours.remove("white")
         if len(sorted_colours) == 0:
-            return "white"
+            return ("white", False)
         
         most_frequent_colour = sorted_colours[0]
         if "white" != most_frequent_colour and colour_occurences["white"] > 0.1 * spots:
-            return f"striped {most_frequent_colour}"
+            return (most_frequent_colour, True)
         else:
-            return "white"
+            return ("white", False)
     
-    return most_frequent_colour
+    return (most_frequent_colour, False)
         
    
 def debug_classify_ball(balls: list[tuple[int]], table_img: np.ndarray, index: int):
@@ -143,36 +138,38 @@ def debug_classify_ball(balls: list[tuple[int]], table_img: np.ndarray, index: i
     
     cv2.imshow("Debug", debug_img)
     return result
-"""                 
 
-    colours = np.array(colours)
-    mean = np.mean(colours, axis=0)
-    std = np.std(colours, axis=0)
-    print(std)
-
-    threshold = 1
-
-    distances = np.abs(colours - mean)
-    mask = np.all(distances < threshold * std, axis=1)
-
-    # Return filtered array
-    filtered_colours = colours[mask]
-
-    avg_colour = np.mean(filtered_colours, axis=0) 
+RING_THICKNESS = 3
+WHITE_RING_THICKNESS = 2
+RING_OFFSET = 2
+def draw_ball(x: int, y: int, radius: int, colour: str, stripped: bool, img: np.ndarray):
+    """
+    Draws the ball on the image
+    """
+    #get the hsv colour of the ball
+    hsv = colours[colour]
+    #convert to bgr
+    b, g, r = cv2.cvtColor(np.uint8([[hsv]]), cv2.COLOR_HSV2BGR)[0][0]
     
+    # Convert numpy.uint8 to Python int for OpenCV
+    ring_colour = (int(b), int(g), int(r))
+    #draw the coloured circle
+    radius += RING_OFFSET
+    cv2.circle(img, (x, y), radius, ring_colour, RING_THICKNESS)
     
-    for name, data in colour_data.items():
-        for colour in colours:
-            hue_diff = abs((data["hue"] - colour[0] + 90) % 180 - 90)
-
-            if hue_diff > data["hue_range"]:
-                continue
-
+    if stripped:
+        cv2.circle(img, (x, y), radius + RING_THICKNESS, (255, 255, 255), WHITE_RING_THICKNESS)
         
-            found_colours[name] = found_colours.get(name, 0) + 1
+    return img
+
+def draw_balls_classificiation(table_img: np.ndarray, balls: list[tuple[int]], classifications: list[tuple[str, bool]]):
+    """
+    Draws the balls on the image
+    """
+    new_img = table_img.copy()
+    for i, ball in enumerate(balls):
+        x, y, r = ball
+        colour, stripped = classifications[i]
+        new_img = draw_ball(x, y, r, colour, stripped, new_img)
         
-    print(found_colours)    
-
-
-    return avg_colour
- """
+    return new_img

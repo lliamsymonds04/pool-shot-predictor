@@ -2,7 +2,6 @@ import collections
 from typing import List
 import cv2
 
-
 class BallTracker:
     position_buffer_size = 2
     radius_buffer_size = 2

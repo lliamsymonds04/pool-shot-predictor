@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 from ProcessTable import process_table, find_balls, remove_table_green, make_balls_white, merge_balls
-from ProcessBalls import draw_balls_debug, classify_balls, debug_classify_ball
+from ProcessBalls import draw_balls_debug, classify_balls, debug_classify_ball, draw_balls_classificiation
 from BallHandler import BallHandler
 from util.TouchupImage import touchup_image
 
@@ -24,11 +24,15 @@ def process_image(img: np.ndarray):
     # cv2.imshow("Balls", im1)
     # cv2.imshow("Balls2", im2)
     merged_balls = merge_balls(balls, balls2)
-    new_balls = draw_balls_debug(removed_green, merged_balls)
-    cv2.imshow("Merged Balls", new_balls)
-    # balls = find_balls_contours(removed_green)
+    # new_balls = draw_balls_debug(removed_green, merged_balls)
+    # cv2.imshow("Merged Balls", new_balls)
     # classify_balls(merged_balls, removed_green)
-    print(f"classified ball as {debug_classify_ball(merged_balls, removed_green, 0)}");
+    # print(f"classified ball as {debug_classify_ball(merged_balls, removed_green, 0)}");
+    ball_classifications = classify_balls(merged_balls, removed_green)
+    print(ball_classifications)
+    result = draw_balls_classificiation(table, merged_balls, ball_classifications)
+    cv2.imshow("Classified Balls", result)
+    
 
     
     if cv2.waitKey(0) == ord('q'):
