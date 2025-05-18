@@ -48,9 +48,12 @@ def get_colour(h: int, s: int, v: int):
     #handle black
     if s < 30 and v < 30 and (h != 0 and s != 0 and v != 0):
         return "black"
-    
+
+    #handle white
+    if s < 30 and v > 200:
+        return "white"
+
     #handle other colours
-    # for colour, values in colours.items():
     for colour in colour_data.keys():
         target_hue = colour_data[colour]["hue"]
         hue_range = colour_data[colour]["hue_range"]
@@ -65,20 +68,20 @@ def get_colour(h: int, s: int, v: int):
               
         return colour
 
-    #handle white
-    if s < 30 and v > 200:
+    #classify white again but with higher s
+    if s < 50 and v > 200:
         return "white"
-    
+   
     return "unknown"
         
 def classify_ball(x: int, y: int, r: int, hsv_image: np.ndarray, debug: bool = False) -> tuple[str, bool]:
     branches = 8
-    colour_occurences = {}
+    colour_occurrences = {}
     spots= 0
     max_y, max_x = hsv_image.shape[:2]
     for i in range(0, 360, int(360/branches)):  
         angle = np.radians(i)
-        for j in range(2,r,3):
+        for j in range(4,r,2):
             spots +=1
             x1 = int(x + j * np.cos(angle))
             y1 = int(y + j * np.sin(angle))
@@ -91,20 +94,20 @@ def classify_ball(x: int, y: int, r: int, hsv_image: np.ndarray, debug: bool = F
             if colour == "unknown":
                 continue
             
-            colour_occurences[colour] = colour_occurences.get(colour, 0) + 1
-            
-    if debug:
-        print(spots)
-        print(colour_occurences)
-     
+            colour_occurrences[colour] = colour_occurrences.get(colour, 0) + 1
+
     # Sort the colours by frequency (most frequent first)
-    sorted_colours = [k for k, v in sorted(colour_occurences.items(), key=lambda x: x[1], reverse=True)]
+    sorted_colours = [k for k, v in sorted(colour_occurrences.items(), key=lambda x: x[1], reverse=True)]
     if "unknown" in sorted_colours:
         sorted_colours.remove("unknown")
         if len(sorted_colours) == 0:
             # no detected colours
             return ("unknown", False)
-        
+
+    if debug:
+        print(spots)
+        print(colour_occurrences)   
+
     most_frequent_colour = sorted_colours[0]
     
     if most_frequent_colour == "black":
@@ -116,7 +119,7 @@ def classify_ball(x: int, y: int, r: int, hsv_image: np.ndarray, debug: bool = F
             return ("white", False)
         
         most_frequent_colour = sorted_colours[0]
-        if "white" != most_frequent_colour and colour_occurences["white"] > 0.1 * spots:
+        if "white" != most_frequent_colour and colour_occurrences["white"] >= 2:
             return (most_frequent_colour, True)
         else:
             return ("white", False)
@@ -142,7 +145,7 @@ def debug_classify_ball(balls: list[tuple[int]], table_img: np.ndarray, index: i
 RING_THICKNESS = 3
 WHITE_RING_THICKNESS = 2
 RING_OFFSET = 2
-def draw_ball(x: int, y: int, radius: int, colour: str, stripped: bool, img: np.ndarray):
+def draw_ball(x: int, y: int, radius: int, colour: str, stripped: bool, number: int, img: np.ndarray):
     """
     Draws the ball on the image
     """
@@ -156,6 +159,7 @@ def draw_ball(x: int, y: int, radius: int, colour: str, stripped: bool, img: np.
     #draw the coloured circle
     radius += RING_OFFSET
     cv2.circle(img, (x, y), radius, ring_colour, RING_THICKNESS)
+    cv2.putText(img, str(number), (x + int(radius * 1.5), int(y - radius * 1.5)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
     
     if stripped:
         cv2.circle(img, (x, y), radius + RING_THICKNESS, (255, 255, 255), WHITE_RING_THICKNESS)
@@ -170,6 +174,6 @@ def draw_balls_classificiation(table_img: np.ndarray, balls: list[tuple[int]], c
     for i, ball in enumerate(balls):
         x, y, r = ball
         colour, stripped = classifications[i]
-        new_img = draw_ball(x, y, r, colour, stripped, new_img)
+        new_img = draw_ball(x, y, r, colour, stripped, i, new_img)
         
     return new_img

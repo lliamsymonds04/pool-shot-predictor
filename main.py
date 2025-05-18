@@ -21,19 +21,14 @@ def process_image(img: np.ndarray):
     white_balls = make_balls_white(removed_green)
     balls, im1 = find_balls(removed_green)
     balls2, im2 = find_balls(white_balls)
-    # cv2.imshow("Balls", im1)
-    # cv2.imshow("Balls2", im2)
+
     merged_balls = merge_balls(balls, balls2)
-    # new_balls = draw_balls_debug(removed_green, merged_balls)
-    # cv2.imshow("Merged Balls", new_balls)
-    # classify_balls(merged_balls, removed_green)
-    # print(f"classified ball as {debug_classify_ball(merged_balls, removed_green, 0)}");
+
     ball_classifications = classify_balls(merged_balls, removed_green)
     print(ball_classifications)
     result = draw_balls_classificiation(table, merged_balls, ball_classifications)
     cv2.imshow("Classified Balls", result)
-    
-
+    print(f"classified ball as {debug_classify_ball(merged_balls, removed_green, 8)}");
     
     if cv2.waitKey(0) == ord('q'):
         cv2.destroyAllWindows()

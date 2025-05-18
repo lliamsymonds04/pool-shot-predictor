@@ -15,7 +15,7 @@
             "min_hue": 25, 
             "max_hue": 35,
             "hue": 30,
-            "hue_range": 5,
+            "hue_range": 7,
             "v_range": [160, 255]
         },
         {
@@ -26,7 +26,7 @@
             "max_hue": 125,
             "hue": 110,
             "hue_range": 10,
-            "v_range": [160, 255]
+            "v_range": [160, 200]
         },
         {
             "number": 3,
@@ -34,7 +34,7 @@
             "colour": [0,255,255],
             "hue": 175,
             "hue_range": 10,
-            "v_range": [160, 255]
+            "v_range": [160, 200]
         },
         {
             "number": 4,
@@ -42,14 +42,14 @@
             "colour": [135,255,255],
             "hue": 135,
             "hue_range": 15,
-            "v_range": [160, 255]
+            "v_range": [110, 200]
         },
         {
             "number": 5,
             "name": "orange",
             "colour": [15,255,255],
             "hue": 15,
-            "hue_range": 10,
+            "hue_range": 6,
             "v_range": [160, 255]
         },
         {
