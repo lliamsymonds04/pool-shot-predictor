@@ -2,11 +2,14 @@ import cv2
 import json
 import numpy as np
 
+from MyTypes import BallClassification
+
 with open('data/PoolBalls.json', 'r') as f:
     ball_data = json.load(f)
     
 colours = {}
 colour_data = {}
+
           
 for ball in ball_data["balls"]:
     colour: list[int] = ball["colour"]
@@ -74,7 +77,7 @@ def get_colour(h: int, s: int, v: int):
    
     return "unknown"
         
-def classify_ball(x: int, y: int, r: int, hsv_image: np.ndarray, debug: bool = False) -> tuple[str, bool]:
+def classify_ball(x: int, y: int, r: int, hsv_image: np.ndarray, debug: bool = False) -> BallClassification:
     branches = 8
     colour_occurrences = {}
     spots= 0
@@ -102,7 +105,8 @@ def classify_ball(x: int, y: int, r: int, hsv_image: np.ndarray, debug: bool = F
         sorted_colours.remove("unknown")
         if len(sorted_colours) == 0:
             # no detected colours
-            return ("unknown", False)
+            # return {"colour": "unknown", "stripped": False}
+            return BallClassification(colour="unknown", stripped=False)
 
     if debug:
         print(spots)
@@ -111,20 +115,25 @@ def classify_ball(x: int, y: int, r: int, hsv_image: np.ndarray, debug: bool = F
     most_frequent_colour = sorted_colours[0]
     
     if most_frequent_colour == "black":
-        return ("black", False)
+        # return {"colour": "black", "stripped": False}
+        return BallClassification(colour="black", stripped=False)
 
     if "white" in sorted_colours:
         sorted_colours.remove("white")
         if len(sorted_colours) == 0:
-            return ("white", False)
+            # return {"colour": "white", "stripped": False}
+            return BallClassification(colour="white", stripped=False)
         
         most_frequent_colour = sorted_colours[0]
         if "white" != most_frequent_colour and colour_occurrences["white"] >= 2:
-            return (most_frequent_colour, True)
+            # return {"colour": most_frequent_colour, "stripped": True}
+            return BallClassification(colour=most_frequent_colour, stripped=True)
         else:
-            return ("white", False)
+            # return {"colour": "white", "stripped": False}
+            return BallClassification(colour="white", stripped=False)
     
-    return (most_frequent_colour, False)
+    # return {"colour": most_frequent_colour, "stripped": False}
+    return BallClassification(colour=most_frequent_colour, stripped=False)
         
    
 def debug_classify_ball(balls: list[tuple[int]], table_img: np.ndarray, index: int):

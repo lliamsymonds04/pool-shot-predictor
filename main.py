@@ -3,6 +3,7 @@ import numpy as np
 
 from ProcessTable import process_table, find_balls, remove_table_green, make_balls_white, merge_balls, warp_table
 from ProcessBalls import draw_balls_debug, classify_balls, debug_classify_ball, draw_balls_classificiation
+from ShotCalculator import calculate_best_shot
 from util.TouchupImage import touchup_image
 
 def process_image(img: np.ndarray):
@@ -26,9 +27,13 @@ def process_image(img: np.ndarray):
 
     ball_classifications = classify_balls(merged_balls, removed_green)
     print(ball_classifications)
-    result = draw_balls_classificiation(table, merged_balls, ball_classifications)
-    cv2.imshow("Classified Balls", result)
-    print(f"classified ball as {debug_classify_ball(merged_balls, removed_green, 4)}");
+    #result = draw_balls_classificiation(table, merged_balls, ball_classifications)
+    #cv2.imshow("Classified Balls", result)
+    #print(f"classified ball as {debug_classify_ball(merged_balls, removed_green, 4)}");
+
+    raw_table = warp_table(img, warp_matrix, 1000)
+
+    calculate_best_shot(raw_table, merged_balls, ball_classifications)
     
     if cv2.waitKey(0) == ord('q'):
         cv2.destroyAllWindows()
