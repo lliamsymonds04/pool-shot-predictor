@@ -150,4 +150,21 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
     
     #output the image
     cv2.imshow("Best Shot", table)
+
+    #output the best shot information to console
+    if stripped:
+        print("The best shot for stripes is...")
+    else:
+        print("The best shot for solids is...")
+    
+    
+    #determine pocket position
+    pocket_position = "top left" if best_pocket_index == 0 else \
+                     "top middle" if best_pocket_index == 1 else \
+                     "top right" if best_pocket_index == 2 else \
+                     "bottom left" if best_pocket_index == 3 else \
+                     "bottom middle" if best_pocket_index == 4 else \
+                     "bottom right"
+
+    print(f"Hit the {colours[ball_classifications[best_shot_index].colour]} ball into the {pocket_position} pocket.")
     
