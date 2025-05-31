@@ -137,9 +137,11 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
     possible_balls = []
     found_black = -1
     for i, classification in enumerate(ball_classifications):
-        if classification.colour == "black":
+        if i == "unknown":
+            continue
+        elif classification.colour == "black":
             found_black = True
-        elif classification.colour != "white" and (not stripped or classification.stripped):
+        elif classification.colour != "white" and (classification.stripped == stripped):
             possible_balls.append(i)
 
     if len(possible_balls) == 0:

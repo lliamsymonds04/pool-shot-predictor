@@ -24,13 +24,9 @@ def process_image(img: np.ndarray):
     merged_balls = merge_balls(balls, balls2)
 
     ball_classifications = classify_balls(merged_balls, removed_green)
-    #result = draw_balls_classificiation(table, merged_balls, ball_classifications)
-    #cv2.imshow("Classified Balls", result)
-    #print(f"classified ball as {debug_classify_ball(merged_balls, removed_green, 4)}");
-
     raw_table = warp_table(img, warp_matrix, 1000)
 
-    calculate_best_shot(raw_table, merged_balls, ball_classifications)
+    calculate_best_shot(raw_table, merged_balls, ball_classifications, False)
     
     if cv2.waitKey(0) == ord('q'):
         cv2.destroyAllWindows()
