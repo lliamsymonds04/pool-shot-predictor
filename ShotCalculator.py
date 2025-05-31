@@ -25,15 +25,16 @@ def get_traj(ax: int, ay: int, bx: int, by: int):
     
     return v
 
-def get_ghost_ball_position(ball_x: int, ball_y: int, pocket_x: int, pocket_y: int, white_ball_radius: int) -> tuple[int, int]:
+def get_ghost_ball_position(ball_x: int, ball_y: int, pocket_x: int, pocket_y: int, ball_radius: int, white_ball_radius: int) -> tuple[int, int]:
     ball_to_pocket = np.array([pocket_x - ball_x, pocket_y - ball_y])
     ball_to_pocket_length = np.linalg.norm(ball_to_pocket)
     if ball_to_pocket_length == 0:
         return (ball_x, ball_y)  # Avoid division by zero
 
     direction = ball_to_pocket / ball_to_pocket_length
-    ghost_ball_x = int(pocket_x - direction[0] * white_ball_radius)
-    ghost_ball_y = int(pocket_y - direction[1] * white_ball_radius)
+    r = white_ball_radius + ball_radius
+    ghost_ball_x = int(ball_x - direction[0] * r)
+    ghost_ball_y = int(ball_y - direction[1] * r)
 
     return (ghost_ball_x, ghost_ball_y)
     
@@ -92,12 +93,13 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
     best_shot_index = -1
     best_pocket_index = -1
     best_shot_angle = float('inf')  # Start with a very large angle
+    # best_shot_angle = 0
     for pocket in pocket_positions:
         pocket_x, pocket_y = pocket
 
         for ball_index in possible_balls:
-            ball_x, ball_y, _ = balls[ball_index]
-            ghost_ball_x, ghost_ball_y = get_ghost_ball_position(ball_x, ball_y, pocket_x, pocket_y, white_ball_r)
+            ball_x, ball_y, ball_r = balls[ball_index]
+            ghost_ball_x, ghost_ball_y = get_ghost_ball_position(ball_x, ball_y, pocket_x, pocket_y, ball_r, white_ball_r)
 
             #determine if the white ball can hit the ghost ball
             
@@ -117,7 +119,8 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
                 continue
             pocket_traj /= pocket_traj_length
 
-            shot_angle = np.arccos(np.clip(np.dot(white_ball_traj, pocket_traj), -1.0, 1.0)) * (180 / np.pi)
+            shot_angle = abs(np.arccos(np.clip(np.dot(white_ball_traj, pocket_traj), -1.0, 1.0)) * (180 / np.pi))
+            
             
             #if shot angle is less than curreent best angle, update best shot
             if shot_angle < best_shot_angle:
@@ -131,10 +134,10 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
         return
     
     best_ball = balls[best_shot_index]
-    best_ball_x, best_ball_y, _ = best_ball
+    best_ball_x, best_ball_y, best_ball_r = best_ball
     best_pocket = pocket_positions[best_pocket_index]
     best_pocket_x, best_pocket_y = best_pocket
-    ghost_ball_x, ghost_ball_y = get_ghost_ball_position(best_ball_x, best_ball_y, best_pocket_x, best_pocket_y, white_ball_r)
+    ghost_ball_x, ghost_ball_y = get_ghost_ball_position(best_ball_x, best_ball_y, best_pocket_x, best_pocket_y, best_ball_r, white_ball_r)
 
     #draw the ghost ball
     cv2.circle(table, (ghost_ball_x, ghost_ball_y), white_ball_r, ghost_ball_colour, -1)

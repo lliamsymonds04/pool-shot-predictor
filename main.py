@@ -24,7 +24,6 @@ def process_image(img: np.ndarray):
     merged_balls = merge_balls(balls, balls2)
 
     ball_classifications = classify_balls(merged_balls, removed_green)
-    print(ball_classifications)
     #result = draw_balls_classificiation(table, merged_balls, ball_classifications)
     #cv2.imshow("Classified Balls", result)
     #print(f"classified ball as {debug_classify_ball(merged_balls, removed_green, 4)}");
