@@ -83,6 +83,7 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
     for i, classification in enumerate(ball_classifications):
         if classification.colour != "white" and (not stripped or classification.stripped):
             possible_balls.append(i)
+            print(classification.colour)
 
     if len(possible_balls) == 0:
         print("No possible balls to hit!")
@@ -166,5 +167,5 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
                      "bottom middle" if best_pocket_index == 4 else \
                      "bottom right"
 
-    print(f"Hit the {colours[ball_classifications[best_shot_index].colour]} ball into the {pocket_position} pocket.")
+    print(f"Hit the {ball_classifications[best_shot_index].colour} ball into the {pocket_position} pocket.")
     
