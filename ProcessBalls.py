@@ -105,7 +105,6 @@ def classify_ball(x: int, y: int, r: int, hsv_image: np.ndarray, debug: bool = F
         sorted_colours.remove("unknown")
         if len(sorted_colours) == 0:
             # no detected colours
-            # return {"colour": "unknown", "stripped": False}
             return BallClassification(colour="unknown", stripped=False)
 
     if debug:
@@ -121,18 +120,14 @@ def classify_ball(x: int, y: int, r: int, hsv_image: np.ndarray, debug: bool = F
     if "white" in sorted_colours:
         sorted_colours.remove("white")
         if len(sorted_colours) == 0:
-            # return {"colour": "white", "stripped": False}
             return BallClassification(colour="white", stripped=False)
         
         most_frequent_colour = sorted_colours[0]
         if "white" != most_frequent_colour and colour_occurrences["white"] >= 2:
-            # return {"colour": most_frequent_colour, "stripped": True}
             return BallClassification(colour=most_frequent_colour, stripped=True)
         else:
-            # return {"colour": "white", "stripped": False}
             return BallClassification(colour="white", stripped=False)
     
-    # return {"colour": most_frequent_colour, "stripped": False}
     return BallClassification(colour=most_frequent_colour, stripped=False)
         
    

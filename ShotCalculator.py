@@ -80,14 +80,22 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
 
     #get all the possible balls
     possible_balls = []
+    found_black = -1
     for i, classification in enumerate(ball_classifications):
-        if classification.colour != "white" and (not stripped or classification.stripped):
+        if classification.colour == "black":
+            found_black = True
+        elif classification.colour != "white" and (not stripped or classification.stripped):
             possible_balls.append(i)
             print(classification.colour)
+        
 
     if len(possible_balls) == 0:
-        print("No possible balls to hit!")
-        return
+        #only the black ball is left can it be sunk
+        if found_black >= 0:
+            possible_balls.append(found_black)
+        else:
+            print("No possible balls to hit!")
+            return
 
     #calculate the best shot
     white_ball_x, white_ball_y, white_ball_r = balls[white_ball_index]
