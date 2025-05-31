@@ -53,8 +53,9 @@ def prompt_user_for_strpped():
 
 if __name__ == "__main__":
     # Load the image
-    # image_name = "broken_topdown_1"
+    # image_name = "broken_topdown_2"
     # image_path = f"images/table/{image_name}.jpg"
+    # stripped = False
     image_path = prompt_user_for_image()
     stripped = prompt_user_for_strpped()
 

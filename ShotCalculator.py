@@ -106,6 +106,8 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
 
     #draw the balls
     for ball, classification in zip(balls, ball_classifications):
+        if classification.colour == "unknown":
+            continue
         x, y, radius = ball
         hsv = colours[classification.colour]
         b, g, r = cv2.cvtColor(np.uint8([[hsv]]), cv2.COLOR_HSV2BGR)[0][0]

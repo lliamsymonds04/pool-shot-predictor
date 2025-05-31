@@ -103,9 +103,10 @@ def classify_ball(x: int, y: int, r: int, hsv_image: np.ndarray, debug: bool = F
     sorted_colours = [k for k, v in sorted(colour_occurrences.items(), key=lambda x: x[1], reverse=True)]
     if "unknown" in sorted_colours:
         sorted_colours.remove("unknown")
-        if len(sorted_colours) == 0:
-            # no detected colours
-            return BallClassification(colour="unknown", stripped=False)
+        
+    if len(sorted_colours) == 0:
+        # no detected colours
+        return BallClassification(colour="unknown", stripped=False)
 
     if debug:
         print(spots)
