@@ -17,6 +17,15 @@ def get_ghost_ball_position(ball_x: int, ball_y: int, pocket_x: int, pocket_y: i
     return (ghost_ball_x, ghost_ball_y)
     
 
+def get_traj(ax: int, ay: int, bx: int, by: int):
+    v = np.array([bx - ax, by - ay])
+    length = np.linalg.norm(v)
+    if length == 0:
+        return np.array([0, 0])
+    v /= length  # Normalize the vector
+    
+    return v
+
 def does_shot_traj_collide_with_balls(ax: int, ay: int, bx: int, by: int, balls: list[tuple[int]], exclude: int) -> bool:
     #placehold
     return False
@@ -83,10 +92,40 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
             #determine if the shot trajectory collides with any other balls
 
             #determine shot angle
+            traj_x = ghost_ball_x - white_ball_x
+            traj_y = ghost_ball_y - white_ball_y
+            white_ball_traj = np.array([traj_x, traj_y])
+            traj_length = np.linalg.norm(white_ball_traj)
+            if traj_length == 0:
+                continue
+            white_ball_traj /= traj_length
+            pocket_traj = np.array([pocket_x - ghost_ball_x, pocket_y - ghost_ball_y])
+            pocket_traj_length = np.linalg.norm(pocket_traj)
+            if pocket_traj_length == 0:
+                continue
+            pocket_traj /= pocket_traj_length
+
+            shot_angle = np.arccos(np.clip(np.dot(white_ball_traj, pocket_traj), -1.0, 1.0)) * (180 / np.pi)
             
             #if shot angle is less than curreent best angle, update best shot
+            if shot_angle < best_shot_angle:
+                best_shot_angle = shot_angle
+                best_shot_index = ball_index
+                best_pocket_index = pocket_positions.index(pocket)
             
     #draw the best shot
+    if best_shot_index == -1:
+        print("No best shot found!")
+        return
+    
+    best_ball = balls[best_shot_index]
+    best_ball_x, best_ball_y, _ = best_ball
+    best_pocket = pocket_positions[best_pocket_index]
+    best_pocket_x, best_pocket_y = best_pocket
+    ghost_ball_x, ghost_ball_y = get_ghost_ball_position(best_ball_x, best_ball_y, best_pocket_x, best_pocket_y, white_ball_r)
+    # cv2.circle(table, (ghost_ball_x, ghost_ball_y), 10, (0, 255, 0), -1)  # Draw ghost ball
+
+
     
 
 
