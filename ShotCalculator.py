@@ -38,9 +38,64 @@ def get_ghost_ball_position(ball_x: int, ball_y: int, pocket_x: int, pocket_y: i
 
     return (ghost_ball_x, ghost_ball_y)
     
+def line_intersects_circle(x1, y1, x2, y2, cx, cy, r):
+    """Check if line segment from (x1,y1) to (x2,y2) intersects circle at (cx,cy) with radius r"""
+    # Vector from start to end of line
+    dx = x2 - x1
+    dy = y2 - y1
+    
+    # Vector from start of line to circle center
+    fx = x1 - cx
+    fy = y1 - cy
+    
+    # Quadratic equation coefficients
+    a = dx * dx + dy * dy
+    b = 2 * (fx * dx + fy * dy)
+    c = (fx * fx + fy * fy) - r * r
+    
+    discriminant = b * b - 4 * a * c
+    
+    if discriminant < 0:
+        return False  # No intersection
+    
+    # Check if intersection points are within the line segment
+    discriminant = discriminant ** 0.5
+    t1 = (-b - discriminant) / (2 * a)
+    t2 = (-b + discriminant) / (2 * a)
+    
+    # If either intersection point is within [0,1], there's a collision
+    return (0 <= t1 <= 1) or (0 <= t2 <= 1)
 
-def does_shot_traj_collide_with_balls(ax: int, ay: int, bx: int, by: int, balls: list[tuple[int]], exclude: int) -> bool:
+def does_shot_collide_with_balls(ball_index, x: int, y: int, balls: list[tuple[int]]) -> bool:
     #placehold
+    ball_x, ball_y, ball_r = balls[ball_index]
+    #shot_traj = get_traj(x, y, ball_x, ball_y)
+    v = np.array([ball_x - x, ball_y - y], dtype=float)
+    shot_length = np.linalg.norm(v)
+    
+    #normalize the vector
+    if shot_length == 0:
+        return False
+    v /= shot_length  # Normalize the vector
+    
+    #get the perpendicular vector
+    perp_v = np.array([-v[1], v[0]])  # Rotate 90 degrees to get the perpendicular vector
+    
+    pos_a = np.array([ball_x + ball_r * perp_v[0], ball_y + ball_r * perp_v[1]], dtype=float)
+    pos_b = np.array([ball_x - ball_r * perp_v[0], ball_y - ball_r * perp_v[1]], dtype=float)
+    
+    
+    for i, (other_x, other_y, other_r) in enumerate(balls):
+        if i == ball_index:
+            continue
+            
+        # check if the ball intersects with the shot trajectory
+        if line_intersects_circle(pos_a[0], pos_a[1], x, y, other_x, other_y, other_r):
+            return True
+        if line_intersects_circle(pos_b[0], pos_b[1], x, y, other_x, other_y, other_r):
+            return True
+
+        
     return False
 
 def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classifications: list[BallClassification], stripped: bool = False):
@@ -86,8 +141,6 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
             found_black = True
         elif classification.colour != "white" and (not stripped or classification.stripped):
             possible_balls.append(i)
-            print(classification.colour)
-        
 
     if len(possible_balls) == 0:
         #only the black ball is left can it be sunk
@@ -111,9 +164,13 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
             ghost_ball_x, ghost_ball_y = get_ghost_ball_position(ball_x, ball_y, pocket_x, pocket_y, ball_r, white_ball_r)
 
             #determine if the white ball can hit the ghost ball
-            
-            #determine if the shot trajectory collides with any other balls
+            if does_shot_collide_with_balls(white_ball_index, ghost_ball_x, ghost_ball_y, balls):
+                continue
 
+            #determine if the shot trajectory collides with any other balls
+            if does_shot_collide_with_balls(ball_index, pocket_x, pocket_y, balls):
+                continue
+            
             #determine shot angle
             traj_x = ghost_ball_x - white_ball_x
             traj_y = ghost_ball_y - white_ball_y
@@ -176,4 +233,3 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
                      "bottom right"
 
     print(f"Hit the {ball_classifications[best_shot_index].colour} ball into the {pocket_position} pocket.")
-    
