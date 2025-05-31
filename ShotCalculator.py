@@ -99,7 +99,10 @@ def does_shot_collide_with_balls(ball_index, x: int, y: int, balls: list[tuple[i
     return False
 
 def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classifications: list[BallClassification], stripped: bool = False):
-    print("Calculating best shot...")
+    if stripped:
+        print("Calculating best shot for stripes...")
+    else:
+        print("Calculating best shot for solids...")
 
     #draw the balls
     for ball, classification in zip(balls, ball_classifications):
@@ -219,12 +222,8 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
     #output the image
     cv2.imshow("Best Shot", table)
 
-    #output the best shot information to console
-    if stripped:
-        print("The best shot for stripes is...")
-    else:
-        print("The best shot for solids is...")
     
+    #output the best shot
     
     #determine pocket position
     pocket_position = "top left" if best_pocket_index == 0 else \
