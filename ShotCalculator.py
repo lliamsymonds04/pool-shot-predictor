@@ -17,7 +17,11 @@ def get_ghost_ball_position(ball_x: int, ball_y: int, pocket_x: int, pocket_y: i
     return (ghost_ball_x, ghost_ball_y)
     
 
-def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classifications: list[BallClassification]):
+def does_shot_traj_collide_with_balls(ax: int, ay: int, bx: int, by: int, balls: list[tuple[int]], exclude: int) -> bool:
+    #placehold
+    return False
+
+def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classifications: list[BallClassification], stripped: bool = False):
     print("Calculating best shot...")
 
     #draw the balls
@@ -52,10 +56,39 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
         (table_length, table_width) #bottom right
     ]
 
+    #get all the possible balls
+    possible_balls = []
+    for i, classification in enumerate(ball_classifications):
+        if classification.colour != "white" and (not stripped or classification.stripped):
+            possible_balls.append(i)
+
+    if len(possible_balls) == 0:
+        print("No possible balls to hit!")
+        return
+
     #calculate the best shot
-    white_ball_x, white_ball_y, _ = balls[white_ball_index]
+    white_ball_x, white_ball_y, white_ball_r = balls[white_ball_index]
+    best_shot_index = -1
+    best_pocket_index = -1
+    best_shot_angle = float('inf')  # Start with a very large angle
     for pocket in pocket_positions:
         pocket_x, pocket_y = pocket
+
+        for ball_index in possible_balls:
+            ball_x, ball_y, _ = balls[ball_index]
+            ghost_ball_x, ghost_ball_y = get_ghost_ball_position(ball_x, ball_y, pocket_x, pocket_y, white_ball_r)
+
+            #determine if the white ball can hit the ghost ball
+            
+            #determine if the shot trajectory collides with any other balls
+
+            #determine shot angle
+            
+            #if shot angle is less than curreent best angle, update best shot
+            
+    #draw the best shot
+    
+
 
 
         
