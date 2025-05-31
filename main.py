@@ -16,8 +16,6 @@ def process_image(img: np.ndarray):
     if table is None:
         return
     
-    cv2.imshow("Table", table)
-    
     removed_green = remove_table_green(table)
     white_balls = make_balls_white(removed_green)
     balls, im1 = find_balls(removed_green)

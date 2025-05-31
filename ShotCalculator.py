@@ -4,6 +4,27 @@ import numpy as np
 from MyTypes import BallClassification
 from ProcessBalls import colours
 
+cue_colour = (255, 235, 126)
+ball_traj_colour = (255,255,255)
+ghost_ball_colour = (235, 236,240)
+
+cue_thickness = 5
+ball_traj_thickness = 2
+
+#convert to BGR
+cue_colour = cue_colour[::-1]  # Reverse the tuple to convert to BGR
+ball_traj_colour = ball_traj_colour[::-1]  # Reverse the tuple to convert to BGR
+ghost_ball_colour = ghost_ball_colour[::-1]  # Reverse the tuple to convert to BGR
+
+def get_traj(ax: int, ay: int, bx: int, by: int):
+    v = np.array([bx - ax, by - ay])
+    length = np.linalg.norm(v)
+    if length == 0:
+        return np.array([0, 0])
+    v /= length  # Normalize the vector
+    
+    return v
+
 def get_ghost_ball_position(ball_x: int, ball_y: int, pocket_x: int, pocket_y: int, white_ball_radius: int) -> tuple[int, int]:
     ball_to_pocket = np.array([pocket_x - ball_x, pocket_y - ball_y])
     ball_to_pocket_length = np.linalg.norm(ball_to_pocket)
@@ -16,15 +37,6 @@ def get_ghost_ball_position(ball_x: int, ball_y: int, pocket_x: int, pocket_y: i
 
     return (ghost_ball_x, ghost_ball_y)
     
-
-def get_traj(ax: int, ay: int, bx: int, by: int):
-    v = np.array([bx - ax, by - ay])
-    length = np.linalg.norm(v)
-    if length == 0:
-        return np.array([0, 0])
-    v /= length  # Normalize the vector
-    
-    return v
 
 def does_shot_traj_collide_with_balls(ax: int, ay: int, bx: int, by: int, balls: list[tuple[int]], exclude: int) -> bool:
     #placehold
@@ -94,12 +106,12 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
             #determine shot angle
             traj_x = ghost_ball_x - white_ball_x
             traj_y = ghost_ball_y - white_ball_y
-            white_ball_traj = np.array([traj_x, traj_y])
+            white_ball_traj = np.array([traj_x, traj_y], dtype=float)
             traj_length = np.linalg.norm(white_ball_traj)
             if traj_length == 0:
                 continue
             white_ball_traj /= traj_length
-            pocket_traj = np.array([pocket_x - ghost_ball_x, pocket_y - ghost_ball_y])
+            pocket_traj = np.array([pocket_x - ghost_ball_x, pocket_y - ghost_ball_y], dtype=float)
             pocket_traj_length = np.linalg.norm(pocket_traj)
             if pocket_traj_length == 0:
                 continue
@@ -123,15 +135,16 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
     best_pocket = pocket_positions[best_pocket_index]
     best_pocket_x, best_pocket_y = best_pocket
     ghost_ball_x, ghost_ball_y = get_ghost_ball_position(best_ball_x, best_ball_y, best_pocket_x, best_pocket_y, white_ball_r)
-    # cv2.circle(table, (ghost_ball_x, ghost_ball_y), 10, (0, 255, 0), -1)  # Draw ghost ball
 
-
+    #draw the ghost ball
+    cv2.circle(table, (ghost_ball_x, ghost_ball_y), white_ball_r, ghost_ball_colour, -1)
     
+    #draw the strike line
+    cv2.line(table, (white_ball_x, white_ball_y), (ghost_ball_x, ghost_ball_y), cue_colour, cue_thickness)
 
-
-
-        
+    #draw the ball trajectory
+    cv2.line(table, (best_ball_x, best_ball_y), (best_pocket_x, best_pocket_y), ball_traj_colour, ball_traj_thickness)
     
-    
+    #output the image
     cv2.imshow("Best Shot", table)
     
