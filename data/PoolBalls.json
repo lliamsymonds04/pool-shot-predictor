@@ -32,9 +32,9 @@
             "number": 3,
             "name": "red",
             "colour": [0,255,255],
-            "hue": 175,
-            "hue_range": 10,
-            "v_range": [160, 200]
+            "hue": 0,
+            "hue_range": 5,
+            "v_range": [180, 255]
         },
         {
             "number": 4,
@@ -64,9 +64,9 @@
             "number": 7,
             "name": "maroon",
             "colour": [0,255,80],
-            "hue": 0,
-            "hue_range": 0,
-            "v_range": [50,100]
+            "hue": 175,
+            "hue_range": 4,
+            "v_range": [100,200]
         },
         {
             "number": 8,

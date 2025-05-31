@@ -3,12 +3,9 @@ import numpy as np
 
 from ProcessTable import process_table, find_balls, remove_table_green, make_balls_white, merge_balls
 from ProcessBalls import draw_balls_debug, classify_balls, debug_classify_ball, draw_balls_classificiation
-from BallHandler import BallHandler
 from util.TouchupImage import touchup_image
 
 def process_image(img: np.ndarray):
-    ball_handler = BallHandler()
-    
     touchedup_image = touchup_image(img)
     table, warp_matrix = process_table(touchedup_image, 1000)
     if table is None:
@@ -16,7 +13,6 @@ def process_image(img: np.ndarray):
     
     cv2.imshow("Table", table)
     
-
     removed_green = remove_table_green(table)
     white_balls = make_balls_white(removed_green)
     balls, im1 = find_balls(removed_green)
@@ -28,7 +24,7 @@ def process_image(img: np.ndarray):
     print(ball_classifications)
     result = draw_balls_classificiation(table, merged_balls, ball_classifications)
     cv2.imshow("Classified Balls", result)
-    print(f"classified ball as {debug_classify_ball(merged_balls, removed_green, 8)}");
+    print(f"classified ball as {debug_classify_ball(merged_balls, removed_green, 4)}");
     
     if cv2.waitKey(0) == ord('q'):
         cv2.destroyAllWindows()
