@@ -59,10 +59,13 @@ def process_table(img: np.ndarray, table_length: int = 800):
     dst = np.array([[0, 0], [table_length, 0], [table_length, table_width], [0, table_width]], np.float32)
     
     matrix = cv2.getPerspectiveTransform(ordered_corners.astype(np.float32), dst)
-    warped = cv2.warpPerspective(img, matrix, (table_length, table_width))
     
-    return warped, matrix
+    return matrix
            
+def warp_table(img: np.ndarray, warp_matrix: np.ndarray, table_length: int = 800):
+    table_width = int(table_length / 2)
+    
+    return cv2.warpPerspective(img, warp_matrix, (table_length, table_width))
 
 def remove_table_green(img: np.ndarray):
     """
@@ -174,4 +177,3 @@ def merge_balls(balls1: list[tuple[int]], balls2: list[tuple[int]]):
             merged_balls.append(balls2[j])
             
     return merged_balls
-

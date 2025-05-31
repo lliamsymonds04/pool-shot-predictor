@@ -1,13 +1,17 @@
 import cv2
 import numpy as np
 
-from ProcessTable import process_table, find_balls, remove_table_green, make_balls_white, merge_balls
+from ProcessTable import process_table, find_balls, remove_table_green, make_balls_white, merge_balls, warp_table
 from ProcessBalls import draw_balls_debug, classify_balls, debug_classify_ball, draw_balls_classificiation
 from util.TouchupImage import touchup_image
 
 def process_image(img: np.ndarray):
     touchedup_image = touchup_image(img)
-    table, warp_matrix = process_table(touchedup_image, 1000)
+    warp_matrix = process_table(touchedup_image, 1000)
+    if warp_matrix is None:
+        return
+
+    table = warp_table(touchedup_image, warp_matrix, 1000)
     if table is None:
         return
     
