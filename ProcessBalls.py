@@ -9,6 +9,11 @@ with open('data/PoolBalls.json', 'r') as f:
 colours = {}
 colour_data = {}
 
+BRIGHT_V = 200
+DARK_V = 30
+COLOUR_SAT_THREASHOLD = 30
+HIGHER_SAT_THREASHOLD = 70
+
 @dataclass
 class BallClassification:
     colour: str
@@ -24,6 +29,7 @@ for ball in ball_data["balls"]:
             "hue": ball["hue"],
             "hue_range": ball["hue_range"],
             "v_range": ball["v_range"],
+            "sat_range": ball["sat_range"]
         } 
     
 def draw_balls_debug(img: np.ndarray, balls: list[tuple[int]]):
@@ -51,11 +57,11 @@ def classify_balls(balls: list[tuple[int]], table_img: np.ndarray):
         
 def get_colour(h: int, s: int, v: int):
     #handle black
-    if s < 30 and v < 30 and (h != 0 and s != 0 and v != 0):
+    if s < COLOUR_SAT_THREASHOLD and v < DARK_V and (h != 0 and s != 0 and v != 0):
         return "black"
 
     #handle white
-    if s < 30 and v > 200:
+    if s < COLOUR_SAT_THREASHOLD and v > BRIGHT_V:
         return "white"
 
     #handle other colours
@@ -63,6 +69,7 @@ def get_colour(h: int, s: int, v: int):
         target_hue = colour_data[colour]["hue"]
         hue_range = colour_data[colour]["hue_range"]
         v_range = colour_data[colour]["v_range"]
+        sat_range = colour_data[colour]["sat_range"]
 
         hue_diff = abs((int(target_hue) - int(h) + 90) % 180 - 90)
         if abs(hue_diff) > hue_range:
@@ -70,11 +77,14 @@ def get_colour(h: int, s: int, v: int):
         
         if v < v_range[0] or v > v_range[1]:
             continue
+
+        if s < sat_range[0] or s > sat_range[1]:
+            continue
               
         return colour
 
     #classify white again but with higher s
-    if s < 50 and v > 200:
+    if s < HIGHER_SAT_THREASHOLD and v > BRIGHT_V:
         return "white"
    
     return "unknown"
@@ -125,9 +135,7 @@ def classify_ball(x: int, y: int, r: int, hsv_image: np.ndarray, debug: bool = F
             return BallClassification(colour="white", striped=False)
         
         most_frequent_colour = sorted_colours[0]
-        if "white" != most_frequent_colour and colour_occurrences["white"] >= 2:
+        if colour_occurrences["white"] > 2:
             return BallClassification(colour=most_frequent_colour, striped=True)
-        else:
-            return BallClassification(colour="white", striped=False)
     
     return BallClassification(colour=most_frequent_colour, striped=False)

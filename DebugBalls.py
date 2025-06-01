@@ -28,6 +28,10 @@ def debug_table(img: np.ndarray):
     #debug the balls
     debug_img = draw_balls_classificiation(raw_table, merged_balls, ball_classifications)
     cv2.imshow("Debug Balls", debug_img)
+
+    #show info for specific ball
+    ball_index = 8 
+    debug_classify_ball(merged_balls, removed_green, ball_index)
     
     if cv2.waitKey(0) == ord('q'):
         cv2.destroyAllWindows()
@@ -38,6 +42,9 @@ def debug_classify_ball(balls: list[tuple[int]], table_img: np.ndarray, index: i
     hsv_image = cv2.cvtColor(table_img, cv2.COLOR_BGR2HSV)
     result = classify_ball(x, y, r, hsv_image, True)
 
+    if result.colour == "unknown":
+        print(f"Ball {index} is unknown")
+        return
     
     debug_img = table_img.copy()
     #draw the ball
@@ -45,7 +52,7 @@ def debug_classify_ball(balls: list[tuple[int]], table_img: np.ndarray, index: i
     cv2.circle(debug_img, (x, y), 2, (0, 0, 255), 3) # Draw center of circle
     
     cv2.imshow("Debug", debug_img)
-    return result
+    print(f"Ball {index}: {result.colour}, Striped: {result.striped}")
 
 RING_THICKNESS = 3
 WHITE_RING_THICKNESS = 2
@@ -79,6 +86,9 @@ def draw_balls_classificiation(table_img: np.ndarray, balls: list[tuple[int]], c
     for i, ball in enumerate(balls):
         x, y, r = ball
         c = classifications[i]
+        if c.colour == "unknown":
+            continue
+
         new_img = draw_ball(x, y, r, c.colour, c.striped, i, new_img)
         
     return new_img

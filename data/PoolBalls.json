@@ -12,21 +12,19 @@
             "number": 1,
             "name": "yellow",
             "colour": [30,255,255],
-            "min_hue": 25, 
-            "max_hue": 35,
             "hue": 30,
             "hue_range": 7,
-            "v_range": [160, 255]
+            "v_range": [160, 255],
+            "sat_range": [150, 255]
         },
         {
             "number": 2,
             "name": "blue",
             "colour": [120,255,255],
-            "min_hue": 100,
-            "max_hue": 125,
             "hue": 110,
             "hue_range": 10,
-            "v_range": [160, 200]
+            "v_range": [160, 200],
+            "sat_range": [150, 255]
         },
         {
             "number": 3,
@@ -34,7 +32,8 @@
             "colour": [0,255,255],
             "hue": 0,
             "hue_range": 5,
-            "v_range": [180, 255]
+            "v_range": [180, 255],
+            "sat_range": [150, 255]
         },
         {
             "number": 4,
@@ -42,7 +41,8 @@
             "colour": [135,255,255],
             "hue": 135,
             "hue_range": 15,
-            "v_range": [110, 200]
+            "v_range": [40, 200],
+            "sat_range": [60, 255]
         },
         {
             "number": 5,
@@ -50,7 +50,8 @@
             "colour": [15,255,255],
             "hue": 15,
             "hue_range": 6,
-            "v_range": [160, 255]
+            "v_range": [160, 255],
+            "sat_range": [150, 255]
         },
         {
             "number": 6,
@@ -58,7 +59,8 @@
             "colour": [75,255,80],
             "hue": 75,
             "hue_range": 15,
-            "v_range": [50,100]
+            "v_range": [50,100],
+            "sat_range": [150, 255]
         },
         {
             "number": 7,
@@ -66,7 +68,8 @@
             "colour": [0,255,80],
             "hue": 175,
             "hue_range": 4,
-            "v_range": [100,200]
+            "v_range": [100,200],
+            "sat_range": [150, 255]
         },
         {
             "number": 8,
