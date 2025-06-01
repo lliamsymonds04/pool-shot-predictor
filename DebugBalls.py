@@ -50,7 +50,7 @@ def debug_classify_ball(balls: list[tuple[int]], table_img: np.ndarray, index: i
 RING_THICKNESS = 3
 WHITE_RING_THICKNESS = 2
 RING_OFFSET = 2
-def draw_ball(x: int, y: int, radius: int, colour: str, stripped: bool, number: int, img: np.ndarray):
+def draw_ball(x: int, y: int, radius: int, colour: str, striped: bool, number: int, img: np.ndarray):
     """
     Draws the ball on the image
     """
@@ -66,7 +66,7 @@ def draw_ball(x: int, y: int, radius: int, colour: str, stripped: bool, number: 
     cv2.circle(img, (x, y), radius, ring_colour, RING_THICKNESS)
     cv2.putText(img, str(number), (x + int(radius * 1.5), int(y - radius * 1.5)), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 1)
     
-    if stripped:
+    if striped:
         cv2.circle(img, (x, y), radius + RING_THICKNESS, (255, 255, 255), WHITE_RING_THICKNESS)
         
     return img
@@ -79,7 +79,7 @@ def draw_balls_classificiation(table_img: np.ndarray, balls: list[tuple[int]], c
     for i, ball in enumerate(balls):
         x, y, r = ball
         c = classifications[i]
-        new_img = draw_ball(x, y, r, c.colour, c.stripped, i, new_img)
+        new_img = draw_ball(x, y, r, c.colour, c.striped, i, new_img)
         
     return new_img
 

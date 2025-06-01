@@ -3,17 +3,14 @@ import numpy as np
 
 from ProcessBalls import colours, BallClassification
 
-cue_colour = (255, 235, 126)
-ball_traj_colour = (255,255,255)
-ghost_ball_colour = (235, 236,240)
+CUE_COLOUR = (255, 235, 126)[::-1]  # Convert to BGR format
+BALL_TRAJ_COLOUR = (255,255,255)[::-1]  # Convert to BGR format
+GHOST_BALL_COLOUR = (235, 236,240)[::-1] # Convert to BGR format
 
-cue_thickness = 5
-ball_traj_thickness = 2
-
-#convert to BGR
-cue_colour = cue_colour[::-1]  # Reverse the tuple to convert to BGR
-ball_traj_colour = ball_traj_colour[::-1]  # Reverse the tuple to convert to BGR
-ghost_ball_colour = ghost_ball_colour[::-1]  # Reverse the tuple to convert to BGR
+CUE_THICKNESS = 5
+BALL_TRAJ_THICKNESS = 2
+BALL_RING_THICKNESS = 2
+STRIPED_RING_THICKNESS = 1
 
 def get_traj(ax: int, ay: int, bx: int, by: int):
     v = np.array([bx - ax, by - ay])
@@ -97,8 +94,8 @@ def does_shot_collide_with_balls(ball_index, x: int, y: int, balls: list[tuple[i
         
     return False
 
-def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classifications: list[BallClassification], stripped: bool = False):
-    if stripped:
+def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classifications: list[BallClassification], striped: bool = False):
+    if striped:
         print("Calculating best shot for stripes...")
     else:
         print("Calculating best shot for solids...")
@@ -113,7 +110,9 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
         #convert to int
         b, g, r = int(b), int(g), int(r)
         
-        cv2.circle(table, (x, y), radius, (b,g,r), 2)
+        cv2.circle(table, (x, y), radius, (b,g,r), BALL_RING_THICKNESS)
+        if classification.striped:
+            cv2.circle(table, (x, y), radius + BALL_RING_THICKNESS, (255, 255, 255), STRIPED_RING_THICKNESS)
 
     #find the white ball
     white_ball_index = -1
@@ -145,7 +144,7 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
             continue
         elif classification.colour == "black":
             found_black = True
-        elif classification.colour != "white" and (classification.stripped == stripped):
+        elif classification.colour != "white" and (classification.striped == striped):
             possible_balls.append(i)
 
     if len(possible_balls) == 0:
@@ -212,21 +211,21 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
     ghost_ball_x, ghost_ball_y = get_ghost_ball_position(best_ball_x, best_ball_y, best_pocket_x, best_pocket_y, best_ball_r, white_ball_r)
 
     #draw the ghost ball
-    cv2.circle(table, (ghost_ball_x, ghost_ball_y), white_ball_r, ghost_ball_colour, -1)
+    cv2.circle(table, (ghost_ball_x, ghost_ball_y), white_ball_r, GHOST_BALL_COLOUR, -1)
     
     #draw the strike line
     strike_distance = np.linalg.norm([ghost_ball_x - white_ball_x, ghost_ball_y - white_ball_y])
     #offset the white ball position by the radius of the white ball relative to the strike line
     white_ball_x += int(white_ball_r * (ghost_ball_x - white_ball_x) / strike_distance)
     white_ball_y += int(white_ball_r * (ghost_ball_y - white_ball_y) / strike_distance)
-    cv2.line(table, (white_ball_x, white_ball_y), (ghost_ball_x, ghost_ball_y), cue_colour, cue_thickness)
+    cv2.line(table, (white_ball_x, white_ball_y), (ghost_ball_x, ghost_ball_y), CUE_COLOUR, CUE_THICKNESS)
 
     #draw the ball trajectory
     ball_traj_distance = np.linalg.norm([best_pocket_x - ghost_ball_x, best_pocket_y - ghost_ball_y])
     #offset the ghost ball position by the radius of the ball relative to the trajectory line
     best_ball_x += int(best_ball_r * (best_pocket_x - best_ball_x) / ball_traj_distance)
     best_ball_y += int(best_ball_r * (best_pocket_y - best_ball_y) / ball_traj_distance)
-    cv2.line(table, (best_ball_x, best_ball_y), (best_pocket_x, best_pocket_y), ball_traj_colour, ball_traj_thickness)
+    cv2.line(table, (best_ball_x, best_ball_y), (best_pocket_x, best_pocket_y), BALL_TRAJ_COLOUR, BALL_TRAJ_THICKNESS)
     
     #output the image
     cv2.imshow("Best Shot", table)

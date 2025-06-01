@@ -12,7 +12,7 @@ colour_data = {}
 @dataclass
 class BallClassification:
     colour: str
-    stripped: bool
+    striped: bool
           
 for ball in ball_data["balls"]:
     colour: list[int] = ball["colour"]
@@ -108,7 +108,7 @@ def classify_ball(x: int, y: int, r: int, hsv_image: np.ndarray, debug: bool = F
         
     if len(sorted_colours) == 0:
         # no detected colours
-        return BallClassification(colour="unknown", stripped=False)
+        return BallClassification(colour="unknown", striped=False)
 
     if debug:
         print(spots)
@@ -117,17 +117,17 @@ def classify_ball(x: int, y: int, r: int, hsv_image: np.ndarray, debug: bool = F
     most_frequent_colour = sorted_colours[0]
     
     if most_frequent_colour == "black":
-        return BallClassification(colour="black", stripped=False)
+        return BallClassification(colour="black", striped=False)
 
     if "white" in sorted_colours:
         sorted_colours.remove("white")
         if len(sorted_colours) == 0:
-            return BallClassification(colour="white", stripped=False)
+            return BallClassification(colour="white", striped=False)
         
         most_frequent_colour = sorted_colours[0]
         if "white" != most_frequent_colour and colour_occurrences["white"] >= 2:
-            return BallClassification(colour=most_frequent_colour, stripped=True)
+            return BallClassification(colour=most_frequent_colour, striped=True)
         else:
-            return BallClassification(colour="white", stripped=False)
+            return BallClassification(colour="white", striped=False)
     
-    return BallClassification(colour=most_frequent_colour, stripped=False)
+    return BallClassification(colour=most_frequent_colour, striped=False)

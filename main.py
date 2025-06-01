@@ -6,7 +6,7 @@ from ProcessBalls import classify_balls
 from ShotCalculator import calculate_best_shot
 from util.TouchupImage import touchup_image
 
-def play_game(img: np.ndarray, stripped: bool = False):
+def play_game(img: np.ndarray, striped: bool = False):
     touchedup_image = touchup_image(img)
     warp_matrix = process_table(touchedup_image, 1000)
     if warp_matrix is None:
@@ -26,7 +26,7 @@ def play_game(img: np.ndarray, stripped: bool = False):
     ball_classifications = classify_balls(merged_balls, removed_green)
     raw_table = warp_table(img, warp_matrix, 1000)
 
-    calculate_best_shot(raw_table, merged_balls, ball_classifications, stripped)
+    calculate_best_shot(raw_table, merged_balls, ball_classifications, striped)
     
     if cv2.waitKey(0) == ord('q'):
         cv2.destroyAllWindows()
@@ -46,15 +46,15 @@ def prompt_user_for_image():
 
 def prompt_user_for_strpped():
     while True:
-        stripped_input = input("Are you playing stripped balls? (Y/N): ").strip().lower()
-        if stripped_input in ['y', 'n']:
-            return stripped_input == 'y'
+        striped_input = input("Are you playing striped balls? (Y/N): ").strip().lower()
+        if striped_input in ['y', 'n']:
+            return striped_input == 'y'
         print("Invalid input. Please enter 'Y' or 'N'.")
 
 if __name__ == "__main__":
     # Load the image
     image_path = prompt_user_for_image()
-    stripped = prompt_user_for_strpped()
+    striped = prompt_user_for_strpped()
 
     img = cv2.imread(image_path)
-    play_game(img, stripped)
+    play_game(img, striped)
