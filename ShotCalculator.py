@@ -1,8 +1,7 @@
 import cv2
 import numpy as np
 
-from MyTypes import BallClassification
-from ProcessBalls import colours
+from ProcessBalls import colours, BallClassification
 
 cue_colour = (255, 235, 126)
 ball_traj_colour = (255,255,255)
@@ -216,15 +215,15 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
     cv2.circle(table, (ghost_ball_x, ghost_ball_y), white_ball_r, ghost_ball_colour, -1)
     
     #draw the strike line
-    #offset the white ball position by the radius of the white ball relative to the strike line
     strike_distance = np.linalg.norm([ghost_ball_x - white_ball_x, ghost_ball_y - white_ball_y])
+    #offset the white ball position by the radius of the white ball relative to the strike line
     white_ball_x += int(white_ball_r * (ghost_ball_x - white_ball_x) / strike_distance)
     white_ball_y += int(white_ball_r * (ghost_ball_y - white_ball_y) / strike_distance)
     cv2.line(table, (white_ball_x, white_ball_y), (ghost_ball_x, ghost_ball_y), cue_colour, cue_thickness)
 
     #draw the ball trajectory
-    #offset the ghost ball position by the radius of the ball relative to the trajectory line
     ball_traj_distance = np.linalg.norm([best_pocket_x - ghost_ball_x, best_pocket_y - ghost_ball_y])
+    #offset the ghost ball position by the radius of the ball relative to the trajectory line
     best_ball_x += int(best_ball_r * (best_pocket_x - best_ball_x) / ball_traj_distance)
     best_ball_y += int(best_ball_r * (best_pocket_y - best_ball_y) / ball_traj_distance)
     cv2.line(table, (best_ball_x, best_ball_y), (best_pocket_x, best_pocket_y), ball_traj_colour, ball_traj_thickness)
@@ -232,9 +231,6 @@ def calculate_best_shot(table: np.ndarray, balls: list[tuple[int]], ball_classif
     #output the image
     cv2.imshow("Best Shot", table)
 
-    
-    #output the best shot
-    
     #determine pocket position
     pocket_position = "top left" if best_pocket_index == 0 else \
                      "top middle" if best_pocket_index == 1 else \

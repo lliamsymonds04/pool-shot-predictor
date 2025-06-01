@@ -1,8 +1,7 @@
 import cv2
 import json
 import numpy as np
-
-from MyTypes import BallClassification
+from dataclasses import dataclass
 
 with open('data/PoolBalls.json', 'r') as f:
     ball_data = json.load(f)
@@ -10,6 +9,10 @@ with open('data/PoolBalls.json', 'r') as f:
 colours = {}
 colour_data = {}
 
+@dataclass
+class BallClassification:
+    colour: str
+    stripped: bool
           
 for ball in ball_data["balls"]:
     colour: list[int] = ball["colour"]
@@ -17,7 +20,6 @@ for ball in ball_data["balls"]:
     #check if ball can be striped
     colours[ball["name"]] = colour
     if ball["number"] != 8 and ball["number"] != 0:
-    
         colour_data[ball["name"]] = {
             "hue": ball["hue"],
             "hue_range": ball["hue_range"],
@@ -115,7 +117,6 @@ def classify_ball(x: int, y: int, r: int, hsv_image: np.ndarray, debug: bool = F
     most_frequent_colour = sorted_colours[0]
     
     if most_frequent_colour == "black":
-        # return {"colour": "black", "stripped": False}
         return BallClassification(colour="black", stripped=False)
 
     if "white" in sorted_colours:

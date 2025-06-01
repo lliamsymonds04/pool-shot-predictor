@@ -6,7 +6,7 @@ from ProcessBalls import classify_balls
 from ShotCalculator import calculate_best_shot
 from util.TouchupImage import touchup_image
 
-def process_image(img: np.ndarray, stripped: bool = False):
+def play_game(img: np.ndarray, stripped: bool = False):
     touchedup_image = touchup_image(img)
     warp_matrix = process_table(touchedup_image, 1000)
     if warp_matrix is None:
@@ -53,11 +53,8 @@ def prompt_user_for_strpped():
 
 if __name__ == "__main__":
     # Load the image
-    # image_name = "broken_topdown_2"
-    # image_path = f"images/table/{image_name}.jpg"
-    # stripped = False
     image_path = prompt_user_for_image()
     stripped = prompt_user_for_strpped()
 
     img = cv2.imread(image_path)
-    process_image(img, stripped)
+    play_game(img, stripped)
