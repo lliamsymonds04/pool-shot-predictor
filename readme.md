@@ -5,7 +5,7 @@
 * Handles simple collision scenarios
 
 ## Demo
-[![YouTube](http://i.ytimg.com/vi5Lc4tfRdDl0/hqdefault.jpg)](https://www.youtube.com/watch?v=5Lc4tfRdDl0)
+[![YouTube](http://i.ytimg.com/vi/5Lc4tfRdDl0/hqdefault.jpg)](https://www.youtube.com/watch?v=5Lc4tfRdDl0)
 
 ## Downloading
 * Python 3.12 or higher
